@@ -1,10 +1,12 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Block {
 	private final List<Sample> samples = new ArrayList<>();
 	private final int size;
 	private double currentRemainder = 0; 
+	private final List<String> rowPlantIds = new ArrayList<>();
 	
 	public Block(int size) {
 		this.size = size;
@@ -13,6 +15,10 @@ public class Block {
 	public void addSamples(List<Sample> samples, double newRemainder) {
 		this.samples.addAll(samples);
 		currentRemainder = newRemainder;
+	}
+	
+	public void addRowPlantIds(List<String> rowPlantIds) {
+		this.rowPlantIds.addAll(rowPlantIds);
 	}
 
 	public int getSize() {
@@ -25,6 +31,11 @@ public class Block {
 
 	public List<Sample> getSamples() {
 		return samples;
+	}
+	
+	public List<String> getRandomizedPlantLocs() {
+		Collections.shuffle(rowPlantIds);
+		return rowPlantIds;
 	}
 
 	@Override

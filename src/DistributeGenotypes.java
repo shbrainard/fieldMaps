@@ -48,15 +48,14 @@ public class DistributeGenotypes {
 			double numSamplesToBlockPrecise = (1.0 * block.getSize() * oneGenotype.size()) / totalSize + block.getCurrentRemainder();
 			int numSamplesToBlockInt = (int) (Math.round(numSamplesToBlockPrecise + currentRemainder));
 
-			// there's a weird edge case where if the last block is at .5, Math.round will round down and miss the last sample.
-			// in that case, adjust to include the last sample
+			// there are occasional edge cases where the error over or unders by 1 on the last block.
+			// force it to always account for the last sample
 			if (block == blocks.get(blocks.size() - 1)) {
-				if (currSampleIndex + numSamplesToBlockInt < oneGenotype.size()) {
-					numSamplesToBlockInt++;
-				}
+				numSamplesToBlockInt = oneGenotype.size() - currSampleIndex;
 			}
 			
 			currentRemainder = numSamplesToBlockPrecise - numSamplesToBlockInt;
+			assert Math.abs(currentRemainder) < 1;
 			
 			block.addSamples(oneGenotype.subList(currSampleIndex, currSampleIndex + numSamplesToBlockInt), currentRemainder);
 			currSampleIndex += numSamplesToBlockInt;

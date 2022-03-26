@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PlantParser {
@@ -45,17 +46,26 @@ public class PlantParser {
 	}
 	
 	private static final String HEADER = "UID,Cross_ID,Seed_Parent,Pollen_Parent,Lois_ID,Block";
+	private static final String HEADER_SUFFIX = ",Row,Plant";
 
 	public static void printBlocks(List<Block> blocks, String outputFile) {
 		try (BufferedWriter out = new BufferedWriter(new FileWriter(outputFile))) {
 			out.write(HEADER);
+			if (!blocks.get(0).getRandomizedPlantLocs().isEmpty()) {
+				out.write(HEADER_SUFFIX);
+			}
 			out.newLine();
 			
 			for (int i = 0; i < blocks.size(); i++) {
 				Block block = blocks.get(i);
+				Iterator<String> rowPlantLocs = block.getRandomizedPlantLocs().iterator();
+				
 				for (Sample sample : block.getSamples()) {
 					out.write(sample.getId());
 					out.write("," + (i + 1));
+					if (rowPlantLocs.hasNext()) {
+						out.write("," + rowPlantLocs.next());
+					}
 					out.newLine();
 				}
 			}
