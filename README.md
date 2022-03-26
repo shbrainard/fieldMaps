@@ -3,7 +3,7 @@
 
 To run the tool:
 
-java blockAssign.jar <path to config file>
+java blockAssign.jar \<path to config file\>
 
 The config file is a prefs file that specifies:
 
