@@ -1,4 +1,6 @@
 
+Distribute progeny families of potentially unequal size across an arbitrary number of blocks which may have uneven dimensions.  Goal is the proportionally distribute each genotype as closely as possible the ratio of the sizes of the blocks. 
+
 # Instructions
 
 To run the tool:
