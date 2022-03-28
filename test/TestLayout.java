@@ -66,7 +66,7 @@ public class TestLayout {
 	private List<Block> createBlocks(int ...sizes) {
 		List<Block> blocks = new ArrayList<>();
 		for (int size : sizes) {
-			blocks.add(new Block(size));
+			blocks.add(new Block(size, ""));
 		}
 		return blocks;
 	}

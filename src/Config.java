@@ -10,20 +10,27 @@ public class Config {
 	
 	private static final String INPUT_FILE = "plant_file";
 	private static final String OUTPUT_FILE = "output_file";
+	private static final String BLOCK_DESC_OUT = "block_description_output_file";
 	private static final String BLOCK_DEF = "blocks";
 	private static final String BLOCK_COLS = "block_cols";
 	private static final String BLOCK_ROWS = "block_rows";
-	private static final String TOTAL_ROWS = "total_rows";
-	private static final String PLANTS_PER_ROW = "plants_per_row";
+	private static final String ROW_RANGE = "row_range";
+	private static final String PLANTS_PER_ROW_RANGE = "plants_per_row_range";
 	
 	private final String inputFile;
 	private final List<Block> blocks;
 	private final String outputFile;
+	private final String blockDescFile;
 
-	public Config(String inputFile, String outputFile, List<Block> blocks) {
+	public Config(String inputFile, String outputFile, List<Block> blocks, String blockDescFile) {
 		this.inputFile = inputFile;
 		this.outputFile = outputFile;
 		this.blocks = blocks;
+		this.blockDescFile = blockDescFile;
+	}
+
+	public String getBlockDescFile() {
+		return blockDescFile;
 	}
 
 	public String getOutputFile() {
@@ -46,19 +53,22 @@ public class Config {
 				String[] parsed = arg.split("=");
 				props.put(parsed[0].toLowerCase(), parsed[1]);
 			}	
-			String inputFile = props.get(INPUT_FILE);
-			String outputFile = props.get(OUTPUT_FILE);
+			
 			List<Block> blocks = new ArrayList<>();
 			if (props.containsKey(BLOCK_DEF)) {
 				String[] blockDefs = props.get(BLOCK_DEF).split(",", 0);
 				for (String blockDef : blockDefs) {
-					blocks.add(new Block(Integer.parseInt(blockDef)));
+					blocks.add(new Block(Integer.parseInt(blockDef), "Block " + (blocks.size() + 1) + " of size " + blockDef));
 				}
 			} else {
 				int blockCols = Integer.parseInt(props.get(BLOCK_COLS));
 				int blockRows = Integer.parseInt(props.get(BLOCK_ROWS));
-				int fieldCols = Integer.parseInt(props.get(PLANTS_PER_ROW));
-				int fieldRows = Integer.parseInt(props.get(TOTAL_ROWS));
+				String[] rowDef = props.get(ROW_RANGE).split(",", 0);
+				String[] colDef = props.get(PLANTS_PER_ROW_RANGE).split(",", 0);
+				int globalStartCol = Integer.parseInt(colDef[0]);
+				int globalStartRow = Integer.parseInt(rowDef[0]);
+				int fieldCols = Integer.parseInt(colDef[1]) - globalStartCol + 1;
+				int fieldRows = Integer.parseInt(rowDef[1]) - globalStartRow + 1;
 				
 				int minHeight = fieldCols / blockCols;
 				int minWidth = fieldRows / blockRows;
@@ -68,19 +78,21 @@ public class Config {
 				// a block will occupy (roughly) i*minHeight to (i+1)*minHeight plants and j*minWidth to (j+1)*minWdith rows
 				for (int i = 0; i < blockCols; i++) {
 					for (int j = 0; j < blockRows; j++) {
-						int startCol = Math.min(i, nExtraHeight) + i*minHeight;
+						int startCol = Math.min(i, nExtraHeight) + i*minHeight + globalStartCol;
 						int endCol = startCol + minHeight + (i < nExtraHeight ? 1 : 0);
-						int startRow = Math.min(j,  nExtraWidth) + j*minWidth;
+						int startRow = Math.min(j,  nExtraWidth) + j*minWidth + globalStartRow;
 						int endRow = startRow + minWidth + (j < nExtraWidth ? 1 : 0);
 						List<String> blockLabels = createLabels(startCol, endCol, startRow, endRow);
-						Block block = new Block(blockLabels.size());
+						String blockDesc = "Block " + (blocks.size() + 1) + " rows " + startRow 
+								+ " to " + (endRow - 1) + " inclusive, plants within row " + startCol + " to " + (endCol - 1) + " inclusive";
+						Block block = new Block(blockLabels.size(), blockDesc);
 						block.addRowPlantIds(blockLabels);
 						blocks.add(block);
 					}
 				}
 			}
 			
-			return new Config(inputFile, outputFile, blocks);
+			return new Config(props.get(INPUT_FILE), props.get(OUTPUT_FILE), blocks, props.get(BLOCK_DESC_OUT));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -91,7 +103,7 @@ public class Config {
 		List<String> labels = new ArrayList<>();
 		for (int i = startCol; i < endCol; i++) {
 			for (int j = startRow; j < endRow; j++) {
-				labels.add((j+1) + "," + (i+1)); // rows and plants are 1-indexed
+				labels.add(j + "," + i); 
 			}
 		}
 		return labels;

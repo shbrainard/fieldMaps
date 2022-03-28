@@ -7,9 +7,11 @@ public class Block {
 	private final int size;
 	private double currentRemainder = 0; 
 	private final List<String> rowPlantIds = new ArrayList<>();
+	private final String desc;
 	
-	public Block(int size) {
+	public Block(int size, String desc) {
 		this.size = size;
+		this.desc = desc;
 	}
 	
 	public void addSamples(List<Sample> samples, double newRemainder) {
@@ -19,6 +21,10 @@ public class Block {
 	
 	public void addRowPlantIds(List<String> rowPlantIds) {
 		this.rowPlantIds.addAll(rowPlantIds);
+	}
+
+	public String getDesc() {
+		return desc;
 	}
 
 	public int getSize() {
