@@ -11,7 +11,7 @@ The config file is a prefs file that specifies:
 
 `plant_file=\<path to csv with specific layout around cross ids and counts\>`
 
-This can have lots of columns with identifying information that will be retained, but must have a column called "Cross_ID" and a column called "Counts"
+This can have lots of columns with identifying information that will be retained, but at present, there must be a column called "Cross_ID" and a column called "Counts"
 
 `output_file=\<path to write output csv\>`
 
